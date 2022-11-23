@@ -18,9 +18,9 @@ static={cls="static";text="UNPACK DEMO";left=0;top=0;right=600;bottom=100;align=
 )
 /*}}*/
 
-sdat2br="\工具\sdat2br.exe";
-sdat2img="\工具\sdat2img.exe";
-unpackIMG="\工具\unpackImage.exe";
+sdat2br="\tools\sdat2br.exe";
+sdat2img="\tools\sdat2img.exe";
+unpackIMG="\tools\unpackImage.exe";
 
 path="";
 path_name=""
