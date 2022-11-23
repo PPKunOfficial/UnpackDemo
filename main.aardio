@@ -1,0 +1,90 @@
+import win.ui;
+import fsys.dlg;
+import process.popen;
+import fsys.dlg.dir;
+import io
+/*DSG{{*/
+mainForm = win.form(text="UnpackDemo";right=600;bottom=505)
+mainForm.add(
+button={cls="button";text="OPEN FILE";left=26;top=159;right=174;bottom=200;z=1};
+button2={cls="button";text="BR";left=26;top=275;right=174;bottom=322;z=3};
+button3={cls="button";text="OUT";left=26;top=216;right=174;bottom=257;z=9};
+button5={cls="button";text="DAT";left=221;top=275;right=369;bottom=322;z=4};
+button6={cls="button";text="IMG";left=416;top=275;right=564;bottom=322;z=5};
+edit={cls="edit";text="WAIT USER CHOOSE...";left=187;top=159;right=564;bottom=200;edge=1;multiline=1;z=2};
+edit2={cls="edit";text="LOG";left=26;top=336;right=564;bottom=474;edge=1;hscroll=1;multiline=1;vscroll=1;z=7};
+edit3={cls="edit";text="WAIT USER CHOOSE...";left=187;top=216;right=564;bottom=257;edge=1;multiline=1;z=8};
+static={cls="static";text="UNPACK DEMO";left=0;top=0;right=600;bottom=100;align="center";center=1;font=LOGFONT(h=-56;name='Consolas';weight=700);transparent=1;z=6}
+)
+/*}}*/
+
+sdat2br="\工具\sdat2br.exe";
+sdat2img="\工具\sdat2img.exe";
+unpackIMG="\工具\unpackImage.exe";
+
+path="";
+path_name=""
+outpath=""
+mainForm.button.oncommand = function(id,event){
+	path = fsys.dlg.open('所有文件|*.*|文本文件|*.txt||',,,mainForm);
+	if(path){
+		var spath=io.splitpath(path);
+		mainForm.edit.text=path;
+		path_name=spath.name;
+		outpath=spath.dir;
+		mainForm.edit3.text=outpath;
+	}	
+}
+
+mainForm.button3.oncommand = function(id,event){
+	outpath = fsys.dlg.dir(,mainForm,"请选择输出的文件夹");
+	outpath=outpath+"\";
+	if(path){
+		mainForm.edit3.text=outpath;
+	}	
+}
+
+mainForm.button2.oncommand = function(id,event){
+	mainForm.edit2.text="START";
+	
+	var outname=outpath+path_name;
+	var prcs,err = process.popen(sdat2br,"-d -o "+outname+" "+path);
+	if(!prcs) return mainForm.msgboxErr(err); 
+	var result = prcs.readAll();
+	if(result=""){
+		result="SUCCEED";
+	}
+	mainForm.edit2.text=result;
+}
+
+mainForm.button5.oncommand = function(id,event){
+	mainForm.edit2.text="START";
+	var spath=io.splitpath(path);
+	var file_name=io.splitpath(spath.name).name;
+	
+	var transfer_list_path=outpath+file_name+".transfer.list";
+	var img_path=outpath+file_name+".img";
+	var prcs,err = process.popen(sdat2img,transfer_list_path+" "+path+" "+img_path);
+	if(!prcs) return mainForm.msgboxErr(err); 
+	var result = prcs.readAll();
+	if(result=""){
+		result="SUCCEED";
+	}
+	mainForm.edit2.text=result;	
+}
+
+mainForm.button6.oncommand = function(id,event){
+	mainForm.edit2.text="START";
+	
+	var prcs,err = process.popen(unpackIMG,path);
+	if(!prcs) return mainForm.msgboxErr(err); 
+	var result = prcs.readAll();
+	fsys.move("\工具\out\",outpath);
+	if(result=""){
+		result="SUCCEED";
+	}
+	mainForm.edit2.text=result;	
+}
+
+mainForm.show();
+return win.loopMessage();
